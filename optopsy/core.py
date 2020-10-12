@@ -132,56 +132,77 @@ def _calculate_otm_pct(data):
 
 
 def _apply_ratios(data, leg_def):
+    leg_len = len(leg_def)
     for idx in range(1, len(leg_def) + 1):
-        entry_col = f"entry_leg{idx}"
-        exit_col = f"exit_leg{idx}"
-        entry_kwargs = {entry_col: lambda r: r[entry_col] * leg_def[idx - 1][0].value}
-        exit_kwargs = {exit_col: lambda r: r[exit_col] * leg_def[idx - 1][0].value}
+        entry_col = f"entry_leg{idx}" if leg_len > 1 else "entry"
+        exit_col = f"exit_leg{idx}" if leg_len > 1 else "exit"
+        entry_kwargs = {entry_col: lambda r: r[entry_col] * leg_def[idx - 1][0]}
+        exit_kwargs = {exit_col: lambda r: r[exit_col] * leg_def[idx - 1][0]}
         data = data.assign(**entry_kwargs).assign(**exit_kwargs)
 
     return data
 
 
-def _assign_profit(data, leg_def, suffixes):
-    data = _apply_ratios(data, leg_def)
-
-    # determine all entry and exit columns
-    entry_cols = ["entry" + s for s in suffixes]
-    exit_cols = ["exit" + s for s in suffixes]
-
-    # calculate the total entry costs and exit proceeds
+def _calculate_total_entry_exits(data, entry_cols, exit_cols):
     data["total_entry_cost"] = data.loc[:, entry_cols].sum(axis=1)
     data["total_exit_proceeds"] = data.loc[:, exit_cols].sum(axis=1)
+    return data
 
+
+def _calculate_pct_change(data):
     data["pct_change"] = (
         data["total_exit_proceeds"] - data["total_entry_cost"]
     ) / data["total_entry_cost"].abs()
-
+    print("\n")
+    print(data)
     return data
+
+
+def _assign_profit(data, leg_def, suffixes=None):
+    data = _apply_ratios(data, leg_def)
+
+    # determine all entry and exit columns
+    entry_cols = "entry" if suffixes is None else ["entry" + s for s in suffixes]
+    exit_cols = "exit" if suffixes is None else ["exit" + s for s in suffixes]
+
+    # calculate the total entry costs and exit proceeds
+    if len(leg_def) > 1:
+        data = _calculate_total_entry_exits(data, entry_cols, exit_cols)
+    else:
+        data.rename(
+            columns={"entry": "total_entry_cost", "exit": "total_exit_proceeds"},
+            inplace=True,
+        )
+
+    return _calculate_pct_change(data)
 
 
 def _strategy_engine(data, leg_def, join_on=None, rules=None):
     if len(leg_def) == 1:
         data["pct_change"] = (data["exit"] - data["entry"]) / data["entry"].abs()
-        return leg_def[0][1](data)
+        return data.pipe(leg_def[0][1]).pipe(_assign_profit, leg_def)
 
     def _rule_func(d, r, ld):
         return d if r is None else r(d, ld)
 
     partials = [leg[1](data) for leg in leg_def]
+
+    # for regular and iron butterflies,create the corresponding
+    # call/put spreads and then join them to improve performance
     suffixes = [f"_leg{idx}" for idx in range(1, len(leg_def) + 1)]
 
     # noinspection PyTypeChecker
-    return (
+    print("\n")
+    print(
         reduce(
-            lambda left, right: pd.merge(
-                left, right, on=join_on, how="inner", suffixes=suffixes
-            ),
+            lambda left, right: pd.merge(left, right, on=join_on, how="inner"),
             partials,
         )
-        .pipe(_rule_func, rules, leg_def)
-        .pipe(_assign_profit, leg_def, suffixes)
+        # .pipe(_rule_func, rules, leg_def)
+        # .pipe(_assign_profit, leg_def, suffixes)
     )
+
+    return None
 
 
 def _process_strategy(data, **context):

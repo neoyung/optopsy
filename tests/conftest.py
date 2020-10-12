@@ -20,11 +20,15 @@ def data():
     d = [
         ["SPX", 213.93, "call", exp_date, quote_dates[0], 212.5, 7.35, 7.45],
         ["SPX", 213.93, "call", exp_date, quote_dates[0], 215.0, 6.00, 6.05],
+        ["SPX", 213.93, "call", exp_date, quote_dates[0], 217.5, 4.70, 4.85],
         ["SPX", 213.93, "put", exp_date, quote_dates[0], 212.5, 5.70, 5.80],
         ["SPX", 213.93, "put", exp_date, quote_dates[0], 215.0, 7.10, 7.20],
+        ["SPX", 213.93, "put", exp_date, quote_dates[0], 217.5, 8.40, 8.50],
         ["SPX", 220, "call", exp_date, quote_dates[1], 212.5, 7.45, 7.55],
         ["SPX", 220, "call", exp_date, quote_dates[1], 215.0, 4.96, 5.05],
+        ["SPX", 220, "call", exp_date, quote_dates[1], 217.5, 2.46, 2.50],
         ["SPX", 220, "put", exp_date, quote_dates[1], 212.5, 0.0, 0.0],
         ["SPX", 220, "put", exp_date, quote_dates[1], 215.0, 0.0, 0.0],
+        ["SPX", 220, "put", exp_date, quote_dates[1], 217.5, 0.0, 0.0],
     ]
     return pd.DataFrame(data=d, columns=cols)
