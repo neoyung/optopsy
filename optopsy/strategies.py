@@ -14,7 +14,6 @@ from .definitions import (
     double_strike_internal_cols,
     triple_strike_external_cols,
     triple_strike_internal_cols,
-    straddle_internal_cols,
 )
 from .rules import _rule_non_overlapping_strike
 
@@ -47,7 +46,7 @@ def _straddles(data, leg_def, **kwargs):
 
     return _process_strategy(
         data,
-        internal_cols=straddle_internal_cols,
+        internal_cols=single_strike_internal_cols,
         external_cols=single_strike_external_cols,
         leg_def=leg_def,
         join_on=[
@@ -114,6 +113,11 @@ def _butterflies(data, side, **kwargs):
 
     rename_cols = {
         "underlying_price_entry_leg1_x": "underlying_price_entry",
+        "underlying_price_exit_leg1_x": "underlying_price_exit",
+        "otm_pct_range_leg1_x": "otm_pct_range_leg1",
+        "otm_pct_range_leg2_y": "otm_pct_range_leg3",
+        "otm_pct_range_leg2_x": "otm_pct_range_leg2",
+        "dte_range_x": "dte_range",
         "strike_leg2": "strike_leg3",
         "strike_leg": "strike_leg2",
     }

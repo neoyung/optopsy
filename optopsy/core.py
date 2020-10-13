@@ -153,8 +153,6 @@ def _calculate_pct_change(data):
     data["pct_change"] = (
         data["total_exit_proceeds"] - data["total_entry_cost"]
     ) / data["total_entry_cost"].abs()
-    print("\n")
-    print(data)
     return data
 
 
@@ -186,23 +184,19 @@ def _strategy_engine(data, leg_def, join_on=None, rules=None):
         return d if r is None else r(d, ld)
 
     partials = [leg[1](data) for leg in leg_def]
-
-    # for regular and iron butterflies,create the corresponding
-    # call/put spreads and then join them to improve performance
     suffixes = [f"_leg{idx}" for idx in range(1, len(leg_def) + 1)]
 
     # noinspection PyTypeChecker
-    print("\n")
-    print(
+    return (
         reduce(
-            lambda left, right: pd.merge(left, right, on=join_on, how="inner"),
+            lambda left, right: pd.merge(
+                left, right, on=join_on, how="inner", suffixes=suffixes
+            ),
             partials,
         )
-        # .pipe(_rule_func, rules, leg_def)
-        # .pipe(_assign_profit, leg_def, suffixes)
+        .pipe(_rule_func, rules, leg_def)
+        .pipe(_assign_profit, leg_def, suffixes)
     )
-
-    return None
 
 
 def _process_strategy(data, **context):

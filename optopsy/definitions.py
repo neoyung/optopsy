@@ -16,23 +16,8 @@ evaluated_cols = [
 single_strike_internal_cols = [
     "underlying_symbol",
     "underlying_price_entry",
-    "option_type",
     "expiration",
     "dte_entry",
-    "strike",
-    "total_entry_cost",
-    "total_exit_proceeds",
-    "pct_change",
-]
-
-
-straddle_internal_cols = [
-    "underlying_symbol",
-    "underlying_price_entry",
-    "expiration",
-    "dte_entry",
-    "option_type_leg1",
-    "option_type_leg2",
     "strike",
     "total_entry_cost",
     "total_exit_proceeds",
@@ -43,12 +28,16 @@ straddle_internal_cols = [
 double_strike_internal_cols = [
     "underlying_symbol",
     "underlying_price_entry_leg1",
+    "underlying_price_exit_leg1",
     "expiration",
     "dte_entry",
+    "dte_range",
     "option_type_leg1",
     "strike_leg1",
+    "otm_pct_range_leg1",
     "option_type_leg2",
     "strike_leg2",
+    "otm_pct_range_leg2",
     "total_entry_cost",
     "total_exit_proceeds",
     "pct_change",
@@ -57,6 +46,7 @@ double_strike_internal_cols = [
 triple_strike_internal_cols = [
     "underlying_symbol",
     "underlying_price_entry",
+    "underlying_price_exit",
     "expiration",
     "dte_entry",
     "strike_leg1",
