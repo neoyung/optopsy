@@ -8,8 +8,8 @@ evaluated_cols = [
     "otm_pct_entry",
     "underlying_price_entry",
     "underlying_price_exit",
-    "entry",
-    "exit",
+    "entry",  # option_entry_price
+    "exit",  # option_exit_price
 ]
 
 # columns of dataframe after generating strategy

@@ -13,6 +13,7 @@ default_kwargs = {
     "strike": 5,
     "bid": 6,
     "ask": 7,
+    "volume": 8,
 }
 
 
@@ -62,6 +63,7 @@ def csv_data(file_path, **kwargs):
         option_type: int, index of column containing option type of option chain
         bid: int, index of column containing bid price of option chain
         ask: int, index of column containing ask price of option chain
+        volume: int, index of column containing volume of option chain
 
     Returns:
         DataFrame: A dataframe of option chains with standardized columns
@@ -78,6 +80,7 @@ def csv_data(file_path, **kwargs):
         (params["strike"], "strike"),
         (params["bid"], "bid"),
         (params["ask"], "ask"),
+        (params["volume"], "volume")
     ]
 
     return (

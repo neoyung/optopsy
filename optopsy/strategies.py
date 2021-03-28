@@ -8,16 +8,18 @@ from .definitions import (
 )
 from .rules import _rule_non_overlapping_strike
 from enum import Enum
+from .verbose import VERBOSE
 
 default_kwargs = {
-    "dte_interval": 7,
-    "max_entry_dte": 90,
-    "exit_dte": 0,
-    "otm_pct_interval": 0.05,
-    "max_otm_pct": 0.5,
-    "min_bid_ask": 0.05,
-    "drop_nan": True,
-    "raw": False,
+    "dte_interval": 7,  # time difference in terms of expiry dates of option chain for result output dataframe
+    "max_entry_dte": 90,  # max time2expiry in days
+    "exit_dte": 0,  # 0 means hold to maturity, 2 means exit 2 days prior to expiry
+    "otm_pct_interval": 0.025,
+    "max_otm_pct": 0.2,  # HARD_LIMIT: max out of the money percentage, 0.5 OTM = 50% OTM
+    "min_bid_ask": 0.05,  # meaningless trade with no mkt, options with no bid-ask data will be pruned
+    "volume": 0,  # remove illiquid options
+    "drop_nan": True,  # drop NAN in final grpby operation
+    "raw": False,  # final return df's columns, if raw, no data aggregation with basis stats
 }
 
 
@@ -143,3 +145,19 @@ def long_put_spread(data, **kwargs):
 
 def short_put_spread(data, **kwargs):
     return _put_spread(data, [(Side.long, _puts), (Side.short, _puts)], **kwargs)
+
+
+all_strats = (
+    long_calls,
+    long_puts,
+    short_calls,
+    short_puts,
+    long_straddles,
+    short_straddles,
+    long_strangles,
+    short_strangles,
+    long_call_spread,
+    short_call_spread,
+    long_put_spread,
+    short_put_spread,
+)
